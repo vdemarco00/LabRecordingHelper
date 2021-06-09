@@ -1,3 +1,7 @@
+# The RecordingService class contains all logic related to receiving and persisting
+# data gathered from the Lab Streaming Layer (LSL). Currently only supports the Muse headband,
+# but functionality may be extended for other devices.
+
 from pylsl import StreamInlet, resolve_stream
 import csv
 import time
@@ -17,7 +21,7 @@ class RecordingService:
 
 
     # Record EEG and Marker data for a specified duration of time. Defaults to 30 seconds if no arguments are passed.
-    def RecordEEG(self, recordDuration: float):
+    async def RecordEEG(self, recordDuration: float):
         
         print("Waiting for EEG stream...")
         self.EEGStreams = resolve_stream('type', 'EEG')
@@ -38,7 +42,7 @@ class RecordingService:
 
             markerData,markerTimestamp = markerInlet.pull_sample()
 
-    def StartRecord(self):
+    async def StartRecord(self):
         # TODO: empty lists before recording
 
         if self.isRecording:

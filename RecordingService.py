@@ -2,7 +2,6 @@
 # data gathered from the Lab Streaming Layer (LSL). Currently only supports the Muse headband,
 # but functionality may be extended for other devices.
 
-from typing import List
 from pylsl import StreamInlet, resolve_stream
 import csv
 import time
@@ -55,14 +54,14 @@ class RecordingService:
         self.PersistData()
         print("Recording ended.")
 
-    async def StartRecord(self):
+    def StartRecord(self):
         # TODO: empty lists before recording
 
         if self.isRecording:
             print("Already recording.")
             return
+            print("Waiting for EEG stream...")
         
-        print("Waiting for EEG stream...")
         self.EEGStreams = resolve_stream('type', 'EEG')
         print("Found EEG stream.")
 
@@ -78,7 +77,6 @@ class RecordingService:
         print("Recording started.")
 
         while self.isRecording:
-            # TODO: push data to class variable
             samples,timestamps = EEGInlet.pull_chunk()
 
             markerData,markerTimestamp = markerInlet.pull_sample()
@@ -114,9 +112,11 @@ class RecordingService:
     def GenerateSnapshot(self):
         # TODO: provide chunk of data for UI to display
         pass
-    
-    def TestFunc(self):
-        print("This works!")
+
+    def TestAsync(self):
+        time.sleep(1)
+        print("Hello")
+        
 
 
 if __name__ == "__main__":

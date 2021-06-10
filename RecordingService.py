@@ -7,6 +7,8 @@ import csv
 import time
 import sys
 
+from pylsl.pylsl import resolve_byprop
+
 class RecordingService:
 
     def __init__(self):
@@ -22,17 +24,28 @@ class RecordingService:
         self.EEGTimestampList = []
         self.markerList = []
 
+    def FindStreams(self):
+        print("Waiting for EEG stream...")
+
+        self.EEGStreams = resolve_byprop('type', 'EEG', timeout=10)
+        if len(self.EEGStreams) > 0:
+            print("Found EEG stream.")
+        else:
+            print("EEG stream timed out.")
+            return False
+        
+        self.markerStreams = resolve_byprop('type', 'Markers', timeout=10)
+        if len(self.markerStreams) > 0:
+            print("Found marker stream.")
+        else:
+            print("Marker stream timed out.")
+            return False
+        
+        return True
+
 
     # Record EEG and Marker data for a specified duration of time. Defaults to 30 seconds if no arguments are passed.
     def RecordEEG(self, recordDuration: float):
-        
-        print("Waiting for EEG stream...")
-        self.EEGStreams = resolve_stream('type', 'EEG')
-        print("Found EEG stream.")
-
-        print("Waiting for marker stream...")
-        self.markerStreams = resolve_stream('type', 'Markers')
-        print("Found marker stream.")
 
         markerInlet = StreamInlet(self.markerStreams[0])
         EEGInlet = StreamInlet(self.EEGStreams[0])
@@ -60,14 +73,6 @@ class RecordingService:
         if self.isRecording:
             print("Already recording.")
             return
-            print("Waiting for EEG stream...")
-        
-        self.EEGStreams = resolve_stream('type', 'EEG')
-        print("Found EEG stream.")
-
-        print("Waiting for marker stream...")
-        self.markerStreams = resolve_stream('type', 'Markers')
-        print("Found marker stream.")
         
         self.isRecording = True
 
@@ -114,7 +119,7 @@ class RecordingService:
         pass
 
     def TestAsync(self):
-        time.sleep(1)
+        time.sleep(3)
         print("Hello")
         
 

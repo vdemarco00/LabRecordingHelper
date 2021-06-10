@@ -2,6 +2,7 @@
 # data gathered from the Lab Streaming Layer (LSL). Currently only supports the Muse headband,
 # but functionality may be extended for other devices.
 
+from typing import List
 from pylsl import StreamInlet, resolve_stream
 import csv
 import time
@@ -10,7 +11,7 @@ import sys
 class RecordingService:
 
     def __init__(self):
-        self.fields = ['TP9', 'AF7', 'AF8', 'TP10', 'RIGHT AUX']
+        self.fields = ['TIMESTAMP', 'TP9', 'AF7', 'AF8', 'TP10', 'RIGHT AUX', 'MARKER']
         
         self.EEGStreams = any
         self.markerStreams = any
@@ -18,10 +19,13 @@ class RecordingService:
 
         # TODO: define class variables for EEG, timestamp, marker data
 
+        self.EEGDataList = []
+        self.EEGTimestampList = []
+        self.markerList = []
 
 
     # Record EEG and Marker data for a specified duration of time. Defaults to 30 seconds if no arguments are passed.
-    async def RecordEEG(self, recordDuration: float):
+    def RecordEEG(self, recordDuration: float):
         
         print("Waiting for EEG stream...")
         self.EEGStreams = resolve_stream('type', 'EEG')
@@ -41,6 +45,15 @@ class RecordingService:
             samples,timestamps = EEGInlet.pull_chunk()
 
             markerData,markerTimestamp = markerInlet.pull_sample()
+
+            self.EEGDataList.append(samples)
+
+            self.EEGTimestampList.append(timestamps)
+
+            self.markerList.append([markerTimestamp, markerData])
+        
+        self.PersistData()
+        print("Recording ended.")
 
     async def StartRecord(self):
         # TODO: empty lists before recording
@@ -69,6 +82,10 @@ class RecordingService:
             samples,timestamps = EEGInlet.pull_chunk()
 
             markerData,markerTimestamp = markerInlet.pull_sample()
+
+            self.EEGDataList.append(samples)
+            self.EEGTimestampList.append(timestamps)
+            self.markerList.append([markerTimestamp, markerData])
     
     def StopRecord(self):
         if not self.isRecording:
@@ -80,7 +97,19 @@ class RecordingService:
 
     def PersistData(self):
         # TODO: save to a .csv
-        pass
+        finalDataList = []
+        currentIndex = 0
+        for i in range(0, len(self.EEGDataList)):
+            for j in range(0, len(self.EEGDataList[i])):
+                finalDataList.append(self.EEGDataList[i][j])
+                finalDataList[currentIndex].insert(0, self.EEGTimestampList[i][j])
+                currentIndex += 1
+        
+        with open('testSave.csv', 'w') as saveFile:
+            writer = csv.writer(saveFile)
+
+            writer.writerow(self.fields)
+            writer.writerows(finalDataList)
 
     def GenerateSnapshot(self):
         # TODO: provide chunk of data for UI to display
@@ -89,6 +118,7 @@ class RecordingService:
     def TestFunc(self):
         print("This works!")
 
-    
 
-
+if __name__ == "__main__":
+    service = RecordingService()
+    service.RecordEEG(10)

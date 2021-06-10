@@ -7,18 +7,18 @@
 import tkinter as tk
 from RecordingService import RecordingService
 
-class Application():
-    def __init__(self):
-        root = tk.Tk()
-        LabRecorder = RecordingService()
+class Application(tk.Frame):
+    def __init__(self, master=None):
 
-        message = tk.Label(root, text="LabRecordingHelper")
-        message.pack()
+        super().__init__(master)
+        self.master = master
+        LabRecorder = RecordingService()
 
         button = tk.Button(root, text="Do Stuff", command=LabRecorder.TestFunc)
         button.pack()
 
-        root.mainloop()
-
-
-app = Application()
+root = tk.Tk()
+root.title("LabRecordingHelper")
+root.geometry("500x200")
+app = Application(root)
+root.mainloop()

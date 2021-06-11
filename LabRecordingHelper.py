@@ -6,6 +6,7 @@
 
 import tkinter as tk
 from tkinter.constants import *
+from tkinter import filedialog
 from RecordingService import RecordingService
 import threading
 
@@ -25,6 +26,9 @@ class Application(tk.Frame):
 
         stopButton = tk.Button(root, text="Stop", command=self.StopRecording, width=10, height=2)
         stopButton.place(x=20, y=90)
+
+        saveButton = tk.Button(root, text="Save", command=self.SaveRecording, width=10, height=2)
+        saveButton.place(x=20, y=130)
 
         self.statusMessage = tk.Label(root, text="No streams loaded.")
         self.statusMessage.place(x=130, y=15)
@@ -53,6 +57,15 @@ class Application(tk.Frame):
             threading.Thread(target=self.LabRecorder.StopRecord).start()
         else:
             print("No available streams.")
+    
+    def SaveRecording(self):
+        if len(self.LabRecorder.EEGDataList) == 0:
+            print("No data to save.")
+            return
+        savePath = filedialog.asksaveasfilename(defaultextension='.csv')
+        if not savePath == '':
+            self.LabRecorder.PersistData(savePath)
+
 
 root = tk.Tk()
 root.title("LabRecordingHelper")

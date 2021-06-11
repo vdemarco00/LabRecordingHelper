@@ -34,6 +34,7 @@ class RecordingService:
             print("EEG stream timed out.")
             return False
         
+        print("Waiting for marker stream...")
         self.markerStreams = resolve_byprop('type', 'Markers', timeout=10)
         if len(self.markerStreams) > 0:
             print("Found marker stream.")
@@ -46,6 +47,14 @@ class RecordingService:
 
     # Record EEG and Marker data for a specified duration of time. Defaults to 30 seconds if no arguments are passed.
     def RecordEEG(self, recordDuration: float):
+
+        print("Waiting for EEG stream...")
+        self.EEGStreams = resolve_stream('type', 'EEG')
+        print("Found EEG stream.")
+
+        print("Waiting for marker stream...")
+        self.markerStreams = resolve_stream('type', 'Markers')
+        print("Found marker stream.")
 
         markerInlet = StreamInlet(self.markerStreams[0])
         EEGInlet = StreamInlet(self.EEGStreams[0])
@@ -98,7 +107,7 @@ class RecordingService:
         self.isRecording = False
         print("Recording stopped.")
 
-    def PersistData(self):
+    def PersistData(self, filePath):
         # TODO: save to a .csv
         finalDataList = []
         currentIndex = 0
@@ -108,11 +117,13 @@ class RecordingService:
                 finalDataList[currentIndex].insert(0, self.EEGTimestampList[i][j])
                 currentIndex += 1
         
-        with open('testSave.csv', 'w') as saveFile:
+        with open(filePath, 'w') as saveFile:
             writer = csv.writer(saveFile)
 
             writer.writerow(self.fields)
             writer.writerows(finalDataList)
+        
+        print("Data saved to {}".format(filePath))
 
     def GenerateSnapshot(self):
         # TODO: provide chunk of data for UI to display

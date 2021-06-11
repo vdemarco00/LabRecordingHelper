@@ -5,17 +5,18 @@
 from pylsl import StreamInlet, resolve_stream
 import csv
 import time
+import math
 import sys
 
-from pylsl.pylsl import resolve_byprop
+from pylsl.pylsl import StreamInfo, resolve_byprop
 
 class RecordingService:
 
     def __init__(self):
         self.fields = ['TIMESTAMP', 'TP9', 'AF7', 'AF8', 'TP10', 'RIGHT AUX', 'MARKER']
         
-        self.EEGStreams = any
-        self.markerStreams = any
+        self.EEGStreams = list[StreamInfo]
+        self.markerStreams = list[StreamInfo]
         self.isRecording = False
 
         # TODO: define class variables for EEG, timestamp, marker data
@@ -73,16 +74,18 @@ class RecordingService:
 
             self.markerList.append([markerTimestamp, markerData])
         
-        self.PersistData()
+        self.PersistData("testFile.csv")
         print("Recording ended.")
 
     def StartRecord(self):
-        # TODO: empty lists before recording
-
         if self.isRecording:
             print("Already recording.")
             return
         
+        self.EEGDataList.clear()
+        self.EEGTimestampList.clear()
+        self.markerList.clear()
+
         self.isRecording = True
 
         markerInlet = StreamInlet(self.markerStreams[0])
@@ -110,13 +113,28 @@ class RecordingService:
     def PersistData(self, filePath):
         # TODO: save to a .csv
         finalDataList = []
+        timestampList = []
         currentIndex = 0
+
+        for group in self.EEGTimestampList:
+            for i in range(0, len(group)):
+                timestampList.append(self.TruncateFloat(group[i], 3))
+
+        
+        for marker in self.markerList:
+            marker[0] = self.TruncateFloat(marker[0], 3)
+
         for i in range(0, len(self.EEGDataList)):
             for j in range(0, len(self.EEGDataList[i])):
                 finalDataList.append(self.EEGDataList[i][j])
-                finalDataList[currentIndex].insert(0, self.EEGTimestampList[i][j])
+                finalDataList[currentIndex].insert(0, timestampList[currentIndex])
                 currentIndex += 1
         
+        for marker in self.markerList:
+            for data in finalDataList:
+                if abs(data[0] - marker[0]) <= 0.001:
+                    data.append(marker[1][0])
+
         with open(filePath, 'w') as saveFile:
             writer = csv.writer(saveFile)
 
@@ -129,12 +147,11 @@ class RecordingService:
         # TODO: provide chunk of data for UI to display
         pass
 
-    def TestAsync(self):
-        time.sleep(3)
-        print("Hello")
-        
+    # Erwin Mayer's answer: https://stackoverflow.com/questions/8595973/truncate-to-three-decimals-in-python
+    def TruncateFloat(self, input, shiftAmt) -> float:
+        shift = 10.0 ** shiftAmt
+        return math.trunc(input * shift) / shift
 
 
 if __name__ == "__main__":
     service = RecordingService()
-    service.RecordEEG(10)

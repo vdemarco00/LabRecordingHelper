@@ -49,12 +49,15 @@ class Application(tk.Frame):
     def StartRecording(self):
         if self.foundStreams:
             threading.Thread(target=self.LabRecorder.StartRecord).start()
+            self.statusMessage.config(text="Recording started.")
         else:
+            self.statusMessage.config(text="No streams available. Unable to record.")
             print("No available streams.")
     
     def StopRecording(self):
         if self.foundStreams:
             threading.Thread(target=self.LabRecorder.StopRecord).start()
+            self.statusMessage.config(text="Recording stopped.")
         else:
             print("No available streams.")
     

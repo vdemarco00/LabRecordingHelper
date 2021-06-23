@@ -6,9 +6,11 @@
 
 import tkinter as tk
 from tkinter.constants import *
-from tkinter import filedialog
+from tkinter import Button, filedialog
 from RecordingService import RecordingService
 import threading
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg 
+from matplotlib.figure import Figure 
 
 class Application(tk.Frame):
     def __init__(self, master=None):
@@ -33,10 +35,22 @@ class Application(tk.Frame):
         self.statusMessage = tk.Label(root, text="No streams loaded.")
         self.statusMessage.place(x=130, y=15)
 
+        self.fig = Figure()
 
-    def ThreadTest(self):
-        newThread = threading.Thread(target=self.LabRecorder.TestAsync)
-        newThread.start()
+        self.ax = self.fig.add_subplot(111)
+        self.ax.grid()
+
+        self.graph = FigureCanvasTkAgg(self.fig, master=root)
+        self.graph.get_tk_widget().pack()
+
+        self.LabRecorder.SnapshotSubscribe(self.plotter)
+
+    def plotter(self, dpts, timestamps):
+        self.ax.cla()
+        self.ax.grid()
+
+        self.ax.plot(dpts, timestamps)
+        self.graph.draw_idle()
 
     def FindStreams(self):
         self.foundStreams = self.LabRecorder.FindStreams()
@@ -48,7 +62,7 @@ class Application(tk.Frame):
 
     def StartRecording(self):
         if self.foundStreams:
-            threading.Thread(target=self.LabRecorder.StartRecord).start()
+            threading.Thread(target=self.LabRecorder.StartRecord, daemon=True).start()
             self.statusMessage.config(text="Recording started.")
         else:
             self.statusMessage.config(text="No streams available. Unable to record.")
@@ -56,7 +70,7 @@ class Application(tk.Frame):
     
     def StopRecording(self):
         if self.foundStreams:
-            threading.Thread(target=self.LabRecorder.StopRecord).start()
+            threading.Thread(target=self.LabRecorder.StopRecord, daemon=True).start()
             self.statusMessage.config(text="Recording stopped.")
         else:
             print("No available streams.")
@@ -72,6 +86,6 @@ class Application(tk.Frame):
 
 root = tk.Tk()
 root.title("LabRecordingHelper")
-root.geometry("600x300")
+root.geometry("1280x720")
 app = Application(root)
 root.mainloop()

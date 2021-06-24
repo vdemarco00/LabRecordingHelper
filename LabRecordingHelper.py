@@ -4,6 +4,7 @@
 # graph using Matplotlib?
 # UI using Tkinter
 
+import time
 import tkinter as tk
 from tkinter.constants import *
 from tkinter import Button, filedialog
@@ -37,19 +38,46 @@ class Application(tk.Frame):
 
         self.fig = Figure()
 
-        self.ax = self.fig.add_subplot(111)
-        self.ax.grid()
+        self.ax1 = self.fig.add_subplot(221)
+        self.ax2 = self.fig.add_subplot(222)
+        self.ax3 = self.fig.add_subplot(223)
+        self.ax4 = self.fig.add_subplot(224)
+        self.ax1.grid()
+        self.ax2.grid()
+        self.ax3.grid()
+        self.ax4.grid()
 
         self.graph = FigureCanvasTkAgg(self.fig, master=root)
-        self.graph.get_tk_widget().pack()
+        self.graph.get_tk_widget().pack(expand=True)
 
         self.LabRecorder.SnapshotSubscribe(self.plotter)
 
     def plotter(self, dpts, timestamps):
-        self.ax.cla()
-        self.ax.grid()
+        self.ax1.cla()
+        self.ax1.grid()
+        self.ax2.cla()
+        self.ax2.grid()
+        self.ax3.cla()
+        self.ax3.grid()
+        self.ax4.cla()
+        self.ax4.grid()
 
-        self.ax.plot(dpts, timestamps)
+        dp1 = []
+        dp2 = []
+        dp3 = []
+        dp4 = []
+
+        for pt in dpts:
+            dp1.append(pt[0])
+            dp2.append(pt[1])
+            dp3.append(pt[2])
+            dp4.append(pt[3])
+
+        self.ax1.plot(timestamps, dp1)
+        self.ax2.plot(timestamps, dp2)
+        self.ax3.plot(timestamps, dp3)
+        self.ax4.plot(timestamps, dp4)
+
         self.graph.draw_idle()
 
     def FindStreams(self):

@@ -148,12 +148,12 @@ class RecordingService:
     def GenerateSnapshot(self, timestamps, dataPoints):
         # Snapshot event provides chunks of data as they are received
         # calls all subscribed methods
-        newList = []
-        for pt in dataPoints:
-            newList.append(pt[0])
+        # newList = []
+        # for pt in dataPoints:
+        #     newList.append(pt[0])
         if len(timestamps) > 0:
             for method in self.subscribers:
-                method(timestamps, newList)
+                method(dataPoints, timestamps)
 
     def SnapshotSubscribe(self, newSubscriber):
         # subscribe given method to snapshot event

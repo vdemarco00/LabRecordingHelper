@@ -47,12 +47,20 @@ class Application(tk.Frame):
         self.ax3.grid()
         self.ax4.grid()
 
+        self.dp1 = []
+        self.dp2 = []
+        self.dp3 = []
+        self.dp4 = []
+        self.stamps = []
+
         self.graph = FigureCanvasTkAgg(self.fig, master=root)
-        self.graph.get_tk_widget().pack(expand=True)
+        self.graph.get_tk_widget().pack(side="right", ipadx=150, ipady=1000)
 
         self.LabRecorder.SnapshotSubscribe(self.plotter)
 
     def plotter(self, dpts, timestamps):
+        #Not sure what the fastest way to do this is 
+        
         self.ax1.cla()
         self.ax1.grid()
         self.ax2.cla()
@@ -62,21 +70,30 @@ class Application(tk.Frame):
         self.ax4.cla()
         self.ax4.grid()
 
-        dp1 = []
-        dp2 = []
-        dp3 = []
-        dp4 = []
-
         for pt in dpts:
-            dp1.append(pt[0])
-            dp2.append(pt[1])
-            dp3.append(pt[2])
-            dp4.append(pt[3])
+            self.dp1.append(pt[0])
+            self.dp2.append(pt[1])
+            self.dp3.append(pt[2])
+            self.dp4.append(pt[3])
 
-        self.ax1.plot(timestamps, dp1)
-        self.ax2.plot(timestamps, dp2)
-        self.ax3.plot(timestamps, dp3)
-        self.ax4.plot(timestamps, dp4)
+        for stamp in timestamps:
+            self.stamps.append(stamp)
+
+
+        #NOTE: https://thispointer.com/python-how-to-remove-multiple-elements-from-list/
+        #Remove old items from list
+
+        while self.stamps[len(self.stamps) - 1] - self.stamps[0] > 0.1:
+            self.stamps.pop()
+            self.dp1.pop()
+            self.dp2.pop()
+            self.dp3.pop()
+            self.dp4.pop()
+
+        self.ax1.plot(self.stamps, self.dp1)
+        self.ax2.plot(self.stamps, self.dp2)
+        self.ax3.plot(self.stamps, self.dp3)
+        self.ax4.plot(self.stamps, self.dp4)
 
         self.graph.draw_idle()
 

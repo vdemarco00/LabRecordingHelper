@@ -83,12 +83,16 @@ class Application(tk.Frame):
         #NOTE: https://thispointer.com/python-how-to-remove-multiple-elements-from-list/
         #Remove old items from list
 
-        while self.stamps[len(self.stamps) - 1] - self.stamps[0] > 0.1:
-            self.stamps.pop()
-            self.dp1.pop()
-            self.dp2.pop()
-            self.dp3.pop()
-            self.dp4.pop()
+        maxSamples = 4096
+        if len(self.stamps) > maxSamples:
+            self.stamps = self.stamps[len(self.stamps) - maxSamples:len(self.stamps)]
+            self.dp1 = self.dp1[len(self.dp1) - maxSamples:len(self.dp1)]
+            self.dp2 = self.dp2[len(self.dp2) - maxSamples:len(self.dp2)]
+            self.dp3 = self.dp3[len(self.dp3) - maxSamples:len(self.dp3)]
+            self.dp4 = self.dp4[len(self.dp4) - maxSamples:len(self.dp4)]
+        
+        print(self.stamps[len(self.stamps) - 1] - self.stamps[0])
+
 
         self.ax1.plot(self.stamps, self.dp1)
         self.ax2.plot(self.stamps, self.dp2)
@@ -106,6 +110,11 @@ class Application(tk.Frame):
 
 
     def StartRecording(self):
+        self.dp1 = []
+        self.dp2 = []
+        self.dp3 = []
+        self.dp4 = []
+        self.stamps = []
         if self.foundStreams:
             threading.Thread(target=self.LabRecorder.StartRecord, daemon=True).start()
             self.statusMessage.config(text="Recording started.")

@@ -14,8 +14,8 @@ class RecordingService:
     def __init__(self):
         self.fields = ['TIMESTAMP', 'TP9', 'AF7', 'AF8', 'TP10', 'RIGHT AUX', 'MARKER']
         
-        self.EEGStreams = [StreamInfo]
-        self.markerStreams = [StreamInfo]   
+        self.EEGStreams = []
+        self.markerStreams = []   
         self.isRecording = False
         self.subscribers = []
 

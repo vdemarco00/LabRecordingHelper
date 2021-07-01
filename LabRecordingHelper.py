@@ -8,6 +8,8 @@ import time
 import tkinter as tk
 from tkinter.constants import *
 from tkinter import Button, filedialog
+
+from matplotlib import figure
 from RecordingService import RecordingService
 import threading
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg 
@@ -21,27 +23,27 @@ class Application(tk.Frame):
         self.LabRecorder = RecordingService()
         self.foundStreams = False
 
-        findButton = tk.Button(root, text="Find Streams", command=self.FindStreams, width=10, height=2)
-        findButton.place(x=20, y=10, anchor=NW)
+        findButton = tk.Button(root, text="Find Streams", command=self.FindStreams, width=10)
+        findButton.place(x=20, y=40, anchor=NW)
 
-        startButton = tk.Button(root, text="Start", command=self.StartRecording, width=10, height=2)
-        startButton.place(x=20, y=50)
+        startButton = tk.Button(root, text="Start", command=self.StartRecording, width=10)
+        startButton.place(x=20, y=80)
 
-        stopButton = tk.Button(root, text="Stop", command=self.StopRecording, width=10, height=2)
-        stopButton.place(x=20, y=90)
+        stopButton = tk.Button(root, text="Stop", command=self.StopRecording, width=10)
+        stopButton.place(x=20, y=120)
 
-        saveButton = tk.Button(root, text="Save", command=self.SaveRecording, width=10, height=2)
-        saveButton.place(x=20, y=130)
+        saveButton = tk.Button(root, text="Save", command=self.SaveRecording, width=10)
+        saveButton.place(x=20, y=160)
 
         self.statusMessage = tk.Label(root, text="No streams loaded.")
-        self.statusMessage.place(x=130, y=15)
+        self.statusMessage.place(x=20, y=10)
 
         self.fig = Figure()
 
-        self.ax1 = self.fig.add_subplot(221)
-        self.ax2 = self.fig.add_subplot(222)
-        self.ax3 = self.fig.add_subplot(223)
-        self.ax4 = self.fig.add_subplot(224)
+        self.ax1 = self.fig.add_subplot(411)
+        self.ax2 = self.fig.add_subplot(412)
+        self.ax3 = self.fig.add_subplot(413)
+        self.ax4 = self.fig.add_subplot(414)
         self.ax1.grid()
         self.ax2.grid()
         self.ax3.grid()
@@ -54,8 +56,8 @@ class Application(tk.Frame):
         self.stamps = []
 
         self.graph = FigureCanvasTkAgg(self.fig, master=root)
-        self.graph.get_tk_widget().pack(side="right", ipadx=150, ipady=1000)
-
+        self.graph.get_tk_widget().pack(side="right",ipadx=220, ipady=400)
+        
         self.LabRecorder.SnapshotSubscribe(self.plotter)
 
     def plotter(self, dpts, timestamps):
@@ -79,10 +81,6 @@ class Application(tk.Frame):
         for stamp in timestamps:
             self.stamps.append(stamp)
 
-
-        #NOTE: https://thispointer.com/python-how-to-remove-multiple-elements-from-list/
-        #Remove old items from list
-
         maxSamples = 4096
         if len(self.stamps) > maxSamples:
             self.stamps = self.stamps[len(self.stamps) - maxSamples:len(self.stamps)]
@@ -104,9 +102,9 @@ class Application(tk.Frame):
     def FindStreams(self):
         self.foundStreams = self.LabRecorder.FindStreams()
         if self.foundStreams:
-            self.statusMessage.config(text="Found streams. Ready to record.")
+            self.statusMessage.config(text="Ready to record.")
         else:
-            self.statusMessage.config(text="Could not find streams. Try again.")
+            self.statusMessage.config(text="Streams not found.")
 
 
     def StartRecording(self):
@@ -119,7 +117,7 @@ class Application(tk.Frame):
             threading.Thread(target=self.LabRecorder.StartRecord, daemon=True).start()
             self.statusMessage.config(text="Recording started.")
         else:
-            self.statusMessage.config(text="No streams available. Unable to record.")
+            self.statusMessage.config(text="No available streams.")
             print("No available streams.")
     
     def StopRecording(self):

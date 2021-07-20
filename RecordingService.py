@@ -1,6 +1,5 @@
 # The RecordingService class contains all logic related to receiving and persisting
-# data gathered from the Lab Streaming Layer (LSL). Currently only supports the Muse headband,
-# but functionality may be extended for other devices.
+# data gathered from the Lab Streaming Layer (LSL). Currently only supports the Muse headband.
 
 from pylsl import StreamInlet, resolve_stream
 import csv

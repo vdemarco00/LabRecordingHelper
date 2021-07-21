@@ -1,6 +1,5 @@
 # LabRecordingHelper.py contains all UI-related code.
 
-import time
 import tkinter as tk
 from tkinter.constants import *
 from tkinter import Button, filedialog
@@ -89,31 +88,12 @@ class Application(tk.Frame):
         prev2temp = []
         prev3temp = []
         prev4temp = []
-        # self.prev1 = []
-        # self.prev2 = []
-        # self.prev3 = []
-        # self.prev4 = []
+
         for pt in dpts:
-            prev1temp.append(pt[0])
-            prev2temp.append(pt[1])
-            prev3temp.append(pt[2])
-            prev4temp.append(pt[3])
             self.dp1.append(pt[0])
             self.dp2.append(pt[1])
             self.dp3.append(pt[2])
             self.dp4.append(pt[3])
-        
-        countNeeded = len(self.dp1) - len(prev1temp)
-        print("needed: {}".format(countNeeded))
-        
-        self.prev1 = [0] * countNeeded
-        self.prev2 = [0] * countNeeded
-        self.prev3 = [0] * countNeeded
-        self.prev4 = [0] * countNeeded
-        self.prev1.extend(prev1temp)
-        self.prev2.extend(prev2temp)
-        self.prev3.extend(prev3temp)
-        self.prev4.extend(prev4temp)
         
         for stamp in timestamps:
             self.stamps.append(stamp)
@@ -125,22 +105,47 @@ class Application(tk.Frame):
             self.dp2 = self.dp2[len(self.dp2) - maxSamples:len(self.dp2)]
             self.dp3 = self.dp3[len(self.dp3) - maxSamples:len(self.dp3)]
             self.dp4 = self.dp4[len(self.dp4) - maxSamples:len(self.dp4)]
-            self.prev1 = self.prev1[len(self.prev1) - maxSamples:len(self.prev1)]
-            self.prev2 = self.prev2[len(self.prev2) - maxSamples:len(self.prev2)]
-            self.prev3 = self.prev3[len(self.prev3) - maxSamples:len(self.prev3)]
-            self.prev4 = self.prev4[len(self.prev4) - maxSamples:len(self.prev4)]
         
-        print(self.stamps[len(self.stamps) - 1] - self.stamps[0])
-        print("final {}".format(len(self.prev1)))
-        print("timestamps {}".format(len(self.stamps)))
+        # print(self.stamps[len(self.stamps) - 1] - self.stamps[0])
+        countNeeded = len(self.dp1) - len(self.prev1)
+        # print("needed: {}".format(countNeeded))
+
+        prev1temp = [0] * countNeeded
+        prev2temp = [0] * countNeeded
+        prev3temp = [0] * countNeeded
+        prev4temp = [0] * countNeeded
+        prev1temp.extend(self.prev1)
+        prev2temp.extend(self.prev2)
+        prev3temp.extend(self.prev3)
+        prev4temp.extend(self.prev4)
+
+        # print("final {}".format(len(prev1temp)))
+        # print("timestamps {}".format(len(self.stamps)))
         
-        self.ax1.plot(self.stamps, self.prev1)
+        if len(prev1temp) > 0:
+            self.ax1.plot(self.stamps, prev1temp)
+            self.ax2.plot(self.stamps, prev2temp)
+            self.ax3.plot(self.stamps, prev3temp)
+            self.ax4.plot(self.stamps, prev4temp)
         self.ax1.plot(self.stamps, self.dp1)
         self.ax2.plot(self.stamps, self.dp2)
         self.ax3.plot(self.stamps, self.dp3)
         self.ax4.plot(self.stamps, self.dp4)
 
         self.graph.draw_idle()
+
+        self.prev1 = []
+        self.prev2 = []
+        self.prev3 = []
+        self.prev4 = []
+
+        for pt in dpts:
+            self.prev1.append(pt[0])
+            self.prev2.append(pt[1])
+            self.prev3.append(pt[2])
+            self.prev4.append(pt[3])
+
+
 
     def FindStreams(self):
         self.foundStreams = self.LabRecorder.FindStreams()

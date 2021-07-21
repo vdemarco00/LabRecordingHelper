@@ -4,7 +4,6 @@
 from pylsl import StreamInlet, resolve_stream
 import csv
 import time
-import math
 import threading
 from pylsl.pylsl import StreamInfo, resolve_byprop
 
@@ -17,8 +16,6 @@ class RecordingService:
         self.markerStreams = []   
         self.isRecording = False
         self.subscribers = []
-
-        # TODO: define class variables for EEG, timestamp, marker data
 
         self.EEGDataList = []
         self.EEGTimestampList = []
@@ -111,19 +108,13 @@ class RecordingService:
         print("Recording stopped.")
 
     def PersistData(self, filePath):
-        # TODO: save to a .csv
         finalDataList = []
         timestampList = []
         currentIndex = 0
 
         for group in self.EEGTimestampList:
             for i in range(0, len(group)):
-                #timestampList.append(self.TruncateFloat(group[i], 3))
                 timestampList.append(group[i])
-
-        
-        # for marker in self.markerList:
-        #     marker[0] = self.TruncateFloat(marker[0], 3)
 
         for i in range(0, len(self.EEGDataList)):
             for j in range(0, len(self.EEGDataList[i])):
@@ -147,9 +138,6 @@ class RecordingService:
     def GenerateSnapshot(self, timestamps, dataPoints):
         # Snapshot event provides chunks of data as they are received
         # calls all subscribed methods
-        # newList = []
-        # for pt in dataPoints:
-        #     newList.append(pt[0])
         if len(timestamps) > 0:
             for method in self.subscribers:
                 method(dataPoints, timestamps)
@@ -158,10 +146,6 @@ class RecordingService:
         # subscribe given method to snapshot event
         self.subscribers.append(newSubscriber)
 
-    # Erwin Mayer's answer: https://stackoverflow.com/questions/8595973/truncate-to-three-decimals-in-python
-    def TruncateFloat(self, input, shiftAmt) -> float:
-        shift = 10.0 ** shiftAmt
-        return math.trunc(input * shift) / shift
 
 
 if __name__ == "__main__":

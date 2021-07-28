@@ -123,10 +123,10 @@ class Application(tk.Frame):
         # print("timestamps {}".format(len(self.stamps)))
         
         if len(prev1temp) > 0:
-            self.ax1.plot(self.stamps, prev1temp)
-            self.ax2.plot(self.stamps, prev2temp)
-            self.ax3.plot(self.stamps, prev3temp)
-            self.ax4.plot(self.stamps, prev4temp)
+            self.ax1.plot(self.stamps, prev1temp, color="red")
+            self.ax2.plot(self.stamps, prev2temp, color="red")
+            self.ax3.plot(self.stamps, prev3temp, color="red")
+            self.ax4.plot(self.stamps, prev4temp, color="red")
         self.ax1.plot(self.stamps, self.dp1)
         self.ax2.plot(self.stamps, self.dp2)
         self.ax3.plot(self.stamps, self.dp3)
@@ -144,8 +144,6 @@ class Application(tk.Frame):
             self.prev2.append(pt[1])
             self.prev3.append(pt[2])
             self.prev4.append(pt[3])
-
-
 
     def FindStreams(self):
         self.foundStreams = self.LabRecorder.FindStreams()

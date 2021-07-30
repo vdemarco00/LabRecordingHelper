@@ -3,7 +3,6 @@
 import tkinter as tk
 from tkinter.constants import *
 from tkinter import Button, filedialog
-from typing_extensions import IntVar
 
 from matplotlib import figure
 from RecordingService import RecordingService
@@ -32,21 +31,21 @@ class Application(tk.Frame):
         saveButton.place(x=20, y=160)
 
         self.numSubplots = 4
-        self.ax1Active = 1
-        self.ax2Active = 1
-        self.ax3Active = 1
-        self.ax4Active = 1
+        self.ax1Active = True
+        self.ax2Active = True
+        self.ax3Active = True
+        self.ax4Active = True
 
-        self.check1 = tk.Checkbutton(root, text="Enable subplot 1", command=self.ToggleSubplot)
+        self.check1 = tk.Checkbutton(root, text="Enable subplot 1", command=lambda: self.ToggleSubplot(1))
         self.check1.select()
         self.check1.place(x=20, y=200)
-        self.check2 = tk.Checkbutton(root, text="Enable subplot 2", command=self.ToggleSubplot)
+        self.check2 = tk.Checkbutton(root, text="Enable subplot 2", command=lambda: self.ToggleSubplot(2))
         self.check2.select()
         self.check2.place(x=20, y=240)
-        self.check3 = tk.Checkbutton(root, text="Enable subplot 3", command=self.ToggleSubplot)
+        self.check3 = tk.Checkbutton(root, text="Enable subplot 3", command=lambda: self.ToggleSubplot(3))
         self.check3.select()
         self.check3.place(x=20, y=280)
-        self.check4 = tk.Checkbutton(root, text="Enable subplot 4", command=self.ToggleSubplot)
+        self.check4 = tk.Checkbutton(root, text="Enable subplot 4", command=lambda: self.ToggleSubplot(4))
         self.check4.select()
         self.check4.place(x=20, y=320)
 
@@ -198,9 +197,31 @@ class Application(tk.Frame):
         if not savePath == '':
             self.LabRecorder.PersistData(savePath)
 
-    def ToggleSubplot(self):
-        print("Toggle")
-        pass
+    def ToggleSubplot(self, subplot):
+        if subplot == 1:
+            if self.ax1Active == True:
+                self.ax1Active = False
+            else:
+                self.ax1Active = True
+            print(self.ax1Active)
+        if subplot == 2:
+            if self.ax2Active == True:
+                self.ax2Active = False
+            else:
+                self.ax2Active = True
+            print(self.ax2Active)
+        if subplot == 3:
+            if self.ax3Active == True:
+                self.ax3Active = False
+            else:
+                self.ax3Active = True
+            print(self.ax3Active)
+        if subplot == 4:
+            if self.ax4Active == True:
+                self.ax4Active = False
+            else:
+                self.ax4Active = True
+            print(self.ax4Active)
 
 
 root = tk.Tk()

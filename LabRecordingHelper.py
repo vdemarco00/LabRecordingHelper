@@ -3,6 +3,7 @@
 import tkinter as tk
 from tkinter.constants import *
 from tkinter import Button, filedialog
+from typing_extensions import IntVar
 
 from matplotlib import figure
 from RecordingService import RecordingService
@@ -30,17 +31,34 @@ class Application(tk.Frame):
         saveButton = tk.Button(root, text="Save", command=self.SaveRecording, width=10)
         saveButton.place(x=20, y=160)
 
+        self.numSubplots = 4
+        self.ax1Active = 1
+        self.ax2Active = 1
+        self.ax3Active = 1
+        self.ax4Active = 1
+
+        self.check1 = tk.Checkbutton(root, text="Enable subplot 1", command=self.ToggleSubplot)
+        self.check1.select()
+        self.check1.place(x=20, y=200)
+        self.check2 = tk.Checkbutton(root, text="Enable subplot 2", command=self.ToggleSubplot)
+        self.check2.select()
+        self.check2.place(x=20, y=240)
+        self.check3 = tk.Checkbutton(root, text="Enable subplot 3", command=self.ToggleSubplot)
+        self.check3.select()
+        self.check3.place(x=20, y=280)
+        self.check4 = tk.Checkbutton(root, text="Enable subplot 4", command=self.ToggleSubplot)
+        self.check4.select()
+        self.check4.place(x=20, y=320)
+
         self.statusMessage = tk.Label(root, text="No streams loaded.")
         self.statusMessage.place(x=20, y=10)
+
+
 
         self.fig = Figure(figsize=(11,10))
         
 
-        self.numSubplots = 4
-        self.ax1Active = True
-        self.ax2Active = True
-        self.ax3Active = True
-        self.ax4Active = True
+
 
         self.ax1 = self.fig.add_subplot(self.numSubplots,1,1)
         self.ax2 = self.fig.add_subplot(self.numSubplots,1,2)
@@ -73,7 +91,6 @@ class Application(tk.Frame):
         self.LabRecorder.SnapshotSubscribe(self.plotter)
 
     def plotter(self, dpts, timestamps):
-        #Not sure what the fastest way to do this is 
         
         self.ax1.cla()
         self.ax1.grid()
@@ -180,6 +197,10 @@ class Application(tk.Frame):
         savePath = filedialog.asksaveasfilename(defaultextension='.csv')
         if not savePath == '':
             self.LabRecorder.PersistData(savePath)
+
+    def ToggleSubplot(self):
+        print("Toggle")
+        pass
 
 
 root = tk.Tk()
